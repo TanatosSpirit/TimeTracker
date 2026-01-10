@@ -1,15 +1,11 @@
 // presentation/MainViewModel.kt
 package com.example.timetracker.presentation
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.timetracker.data.local.entities.ActivityEntity
 import com.example.timetracker.data.local.entities.TimeEntryEntity
 import com.example.timetracker.data.repository.TimeTrackerRepository
-import com.example.timetracker.presentation.widget.TimeTrackerWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
-import androidx.glance.appwidget.updateAll
 import com.example.timetracker.domain.model.HourSegment
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -69,12 +65,6 @@ class MainViewModel @Inject constructor(
         }
     }
     
-    fun toggleActivity(activityId: Long) {
-        viewModelScope.launch {
-            repository.toggleActivity(activityId)
-        }
-    }
-    
     fun previousDay() {
         _selectedDate.value = Date(_selectedDate.value.time - 24 * 60 * 60 * 1000)
     }
@@ -92,12 +82,6 @@ class MainViewModel @Inject constructor(
         _scrollToCurrentTime.value = null
     }
 
-    fun updateWidget(context: Context) {
-        viewModelScope.launch {
-            TimeTrackerWidget().updateAll(context)
-        }
-    }
-    
     private fun generateRandomColor(): Long {
         val colors = listOf(
             0xFFEF5350, 0xFFEC407A, 0xFFAB47BC, 0xFF7E57C2,
@@ -150,9 +134,3 @@ class MainViewModel @Inject constructor(
     }
 
 }
-
-// Domain models for UI
-data class TimeEntryWithActivity(
-    val entry: TimeEntryEntity,
-    val activity: ActivityEntity
-)

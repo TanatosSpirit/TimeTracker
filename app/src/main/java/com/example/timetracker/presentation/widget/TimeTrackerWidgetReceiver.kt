@@ -1,7 +1,6 @@
 // presentation/widget/TimeTrackerWidgetReceiver.kt
 package com.example.timetracker.presentation.widget
 
-import android.content.Context
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 

@@ -58,10 +58,8 @@ fun QuickEntryDialog(
     viewModel: MainViewModel,
     onDismiss: () -> Unit
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
     var activityName by remember { mutableStateOf("") }
-    val activities by viewModel.activities.collectAsState()
-    
+
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = MaterialTheme.shapes.large,

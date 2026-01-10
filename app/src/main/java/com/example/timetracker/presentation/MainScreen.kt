@@ -25,8 +25,6 @@ import com.example.timetracker.data.local.entities.TimeEntryEntity
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.max
-import kotlin.math.min
 import androidx.compose.foundation.lazy.rememberLazyListState
 import java.util.Calendar
 import com.example.timetracker.domain.model.HourSegment
@@ -173,36 +171,6 @@ fun DayTimeline(
 private fun isToday(date: Date): Boolean {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     return dateFormat.format(date) == dateFormat.format(Date())
-}
-
-private fun calculateOverlapLevels(
-    entries: List<TimeEntryEntity>,
-    hourStart: Long,
-    hourEnd: Long
-): List<Pair<TimeEntryEntity, Int>> {
-    val entriesInHour = entries.filter { entry ->
-        val entryEnd = entry.endTime ?: System.currentTimeMillis()
-        entry.startTime < hourEnd && entryEnd > hourStart
-    }
-
-    return entriesInHour.map { entry ->
-        val entryEnd = entry.endTime ?: System.currentTimeMillis()
-
-        // Считаем, со сколькими записями пересекается эта запись
-        val overlappingCount = entriesInHour.count { other ->
-            if (other.id == entry.id) return@count false
-            val otherEnd = other.endTime ?: System.currentTimeMillis()
-
-            val entryStartInHour = max(entry.startTime, hourStart)
-            val entryEndInHour = min(entryEnd, hourEnd)
-            val otherStartInHour = max(other.startTime, hourStart)
-            val otherEndInHour = min(otherEnd, hourEnd)
-
-            entryStartInHour < otherEndInHour && entryEndInHour > otherStartInHour
-        }
-
-        entry to overlappingCount
-    }
 }
 
 @Composable
@@ -384,14 +352,4 @@ fun AddActivityDialog(
             }
         }
     )
-}
-
-private fun getHourTimestamp(date: Date, hour: Int): Long {
-    val calendar = Calendar.getInstance()
-    calendar.time = date
-    calendar.set(Calendar.HOUR_OF_DAY, hour)
-    calendar.set(Calendar.MINUTE, 0)
-    calendar.set(Calendar.SECOND, 0)
-    calendar.set(Calendar.MILLISECOND, 0)
-    return calendar.timeInMillis
 }

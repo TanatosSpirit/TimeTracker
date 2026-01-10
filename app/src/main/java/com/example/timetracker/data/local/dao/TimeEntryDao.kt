@@ -7,8 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TimeEntryDao {
-//    @Query("SELECT * FROM time_entries WHERE date = :date ORDER BY startTime")
-//    fun getEntriesByDate(date: String): Flow<List<TimeEntryEntity>>
     @Query("""
         SELECT * FROM time_entries 
         WHERE date = :date 

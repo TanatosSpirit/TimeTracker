@@ -2,7 +2,6 @@
 package com.example.timetracker.di
 
 import android.content.Context
-import androidx.room.Room
 import com.example.timetracker.data.local.dao.ActivityDao
 import com.example.timetracker.data.local.dao.TimeEntryDao
 import com.example.timetracker.data.local.database.AppDatabase
@@ -20,11 +19,6 @@ object AppModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
-//        return Room.databaseBuilder(
-//            context,
-//            AppDatabase::class.java,
-//            "time_tracker_database"
-//        ).build()
         return AppDatabase.getInstance(context)
     }
     
