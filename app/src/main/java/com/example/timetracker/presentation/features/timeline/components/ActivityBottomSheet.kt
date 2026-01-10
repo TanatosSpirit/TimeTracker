@@ -10,16 +10,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.timetracker.data.local.entities.ActivityEntity
-import com.example.timetracker.data.local.entities.TimeEntryEntity
+import com.example.timetracker.domain.model.Activity
+import com.example.timetracker.domain.model.TimeEntry
 import com.example.timetracker.presentation.common.utils.DurationFormatter
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityBottomSheet(
-    entry: TimeEntryEntity,
-    activity: ActivityEntity,
+    entry: TimeEntry,
+    activity: Activity,
     isActive: Boolean,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier

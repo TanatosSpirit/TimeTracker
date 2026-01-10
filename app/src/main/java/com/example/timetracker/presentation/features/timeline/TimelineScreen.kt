@@ -9,16 +9,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.timetracker.data.local.entities.ActivityEntity
-import com.example.timetracker.data.local.entities.TimeEntryEntity
-import com.example.timetracker.presentation.MainViewModel
+import com.example.timetracker.domain.model.Activity
+import com.example.timetracker.domain.model.TimeEntry
+import com.example.timetracker.presentation.features.timeline.TimelineViewModel
 import com.example.timetracker.presentation.features.timeline.components.*
 import com.example.timetracker.ui.theme.TimeTrackerTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimelineScreen(
-    viewModel: MainViewModel = hiltViewModel()
+    viewModel: TimelineViewModel = hiltViewModel()
 ) {
     val selectedDate by viewModel.selectedDate.collectAsState()
     val hourSegments by viewModel.hourSegments.collectAsState()
@@ -27,7 +27,7 @@ fun TimelineScreen(
     val scrollToCurrentTime by viewModel.scrollToCurrentTime.collectAsState()
 
     var showAddDialog by remember { mutableStateOf(false) }
-    var selectedEntry by remember { mutableStateOf<Pair<TimeEntryEntity, ActivityEntity>?>(null) }
+    var selectedEntry by remember { mutableStateOf<Pair<TimeEntry, Activity>?>(null) }
 
     val isDarkTheme = isSystemInDarkTheme()
 

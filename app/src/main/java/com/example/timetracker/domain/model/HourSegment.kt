@@ -1,10 +1,13 @@
+// domain/model/HourSegment.kt
 package com.example.timetracker.domain.model
 
-import com.example.timetracker.data.local.entities.TimeEntryEntity
-
+/**
+ * Сегмент записи времени в пределах одного часа.
+ * Используется для отображения активностей на таймлайне.
+ */
 data class HourSegment(
-    val entry: TimeEntryEntity,
-    val hour: Int,          // 0..23
-    val startMinute: Int,   // 0..59
-    val endMinute: Int      // 1..60
+    val entry: TimeEntry,      // Domain модель вместо Entity
+    val hour: Int,             // Час дня (0-23)
+    val startMinute: Int,      // Минута начала в пределах часа (0-59)
+    val endMinute: Int         // Минута окончания в пределах часа (1-60)
 )

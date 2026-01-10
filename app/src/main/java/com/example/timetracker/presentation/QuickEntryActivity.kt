@@ -13,11 +13,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.timetracker.ui.theme.TimeTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import com.example.timetracker.presentation.features.timeline.TimelineViewModel
 
 @AndroidEntryPoint
 class QuickEntryActivity : ComponentActivity() {
 
-    private val viewModel: MainViewModel by viewModels()
+    private val viewModel: TimelineViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +56,7 @@ class QuickEntryActivity : ComponentActivity() {
 
 @Composable
 fun QuickEntryDialog(
-    viewModel: MainViewModel,
+    viewModel: TimelineViewModel,
     onDismiss: () -> Unit
 ) {
     var activityName by remember { mutableStateOf("") }

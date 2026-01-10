@@ -20,7 +20,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.example.timetracker.data.local.database.AppDatabase
-import com.example.timetracker.data.repository.TimeTrackerRepository
+import com.example.timetracker.data.repository.TimeTrackerRepositoryImpl
 import com.example.timetracker.presentation.QuickEntryActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -33,7 +33,7 @@ class TimeTrackerWidget : GlanceAppWidget() {
     
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val database = AppDatabase.getInstance(context)
-        val repository = TimeTrackerRepository(
+        val repository = TimeTrackerRepositoryImpl(
             database.activityDao(),
             database.timeEntryDao()
         )

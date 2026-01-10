@@ -9,17 +9,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.timetracker.data.local.entities.ActivityEntity
-import com.example.timetracker.data.local.entities.TimeEntryEntity
+import com.example.timetracker.domain.model.Activity
+import com.example.timetracker.domain.model.TimeEntry
 import com.example.timetracker.domain.model.HourSegment
 
 @Composable
 fun HourRow(
     hour: Int,
     segments: List<HourSegment>,
-    activitiesMap: Map<Long, ActivityEntity>,
-    activeEntries: List<TimeEntryEntity>,
-    onEntryClick: (TimeEntryEntity, ActivityEntity) -> Unit,
+    activitiesMap: Map<Long, Activity>,
+    activeEntries: List<TimeEntry>,
+    onEntryClick: (TimeEntry, Activity) -> Unit,
     modifier: Modifier = Modifier,
     hourHeightDp: androidx.compose.ui.unit.Dp = 160.dp
 ) {

@@ -13,15 +13,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.timetracker.data.local.entities.ActivityEntity
-import com.example.timetracker.data.local.entities.TimeEntryEntity
+import com.example.timetracker.domain.model.Activity
+import com.example.timetracker.domain.model.TimeEntry
 import com.example.timetracker.presentation.common.utils.DurationFormatter
 import kotlinx.coroutines.delay
 
 @Composable
 fun ColumnScope.TimeEntrySegment(
-    activity: ActivityEntity,
-    entry: TimeEntryEntity,
+    activity: Activity,
+    entry: TimeEntry,
     isActive: Boolean,
     startFraction: Float,
     lengthFraction: Float,
@@ -41,8 +41,7 @@ fun ColumnScope.TimeEntrySegment(
         }
     }
 
-    val entryEnd = if (isActive) currentTime else (entry.endTime ?: entry.startTime)
-    val totalDuration = entryEnd - entry.startTime
+    val totalDuration = entry.duration(currentTime)
     val durationText = DurationFormatter.format(totalDuration)
 
     // Используем точную высоту вместо weight() для устранения дискретности
