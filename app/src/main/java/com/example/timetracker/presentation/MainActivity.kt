@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.example.timetracker.ui.theme.TimeTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
+import com.example.timetracker.presentation.features.timeline.TimelineScreen
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -13,7 +14,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             TimeTrackerTheme  {
-                MainScreen()
+                TimelineScreen()
             }
         }
     }

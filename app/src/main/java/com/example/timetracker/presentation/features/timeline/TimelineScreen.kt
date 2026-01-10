@@ -1,0 +1,94 @@
+// presentation/features/timeline/TimelineScreen.kt
+package com.example.timetracker.presentation.features.timeline
+
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.timetracker.data.local.entities.ActivityEntity
+import com.example.timetracker.data.local.entities.TimeEntryEntity
+import com.example.timetracker.presentation.MainViewModel
+import com.example.timetracker.presentation.features.timeline.components.*
+import com.example.timetracker.ui.theme.TimeTrackerTheme
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimelineScreen(
+    viewModel: MainViewModel = hiltViewModel()
+) {
+    val selectedDate by viewModel.selectedDate.collectAsState()
+    val hourSegments by viewModel.hourSegments.collectAsState()
+    val activities by viewModel.activities.collectAsState()
+    val activeEntries by viewModel.activeEntries.collectAsState()
+    val scrollToCurrentTime by viewModel.scrollToCurrentTime.collectAsState()
+
+    var showAddDialog by remember { mutableStateOf(false) }
+    var selectedEntry by remember { mutableStateOf<Pair<TimeEntryEntity, ActivityEntity>?>(null) }
+
+    val isDarkTheme = isSystemInDarkTheme()
+
+    TimeTrackerTheme(darkTheme = isDarkTheme) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Time Tracker") },
+                    actions = {
+                        IconButton(onClick = { showAddDialog = true }) {
+                            Icon(Icons.Default.Add, contentDescription = "Add Activity")
+                        }
+                    }
+                )
+            }
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+            ) {
+                DateNavigationBar(
+                    date = selectedDate,
+                    onPreviousDay = { viewModel.previousDay() },
+                    onNextDay = { viewModel.nextDay() },
+                    onToday = { viewModel.goToToday() }
+                )
+
+                DayTimeline(
+                    hourSegments = hourSegments,
+                    activities = activities,
+                    activeEntries = activeEntries,
+                    selectedDate = selectedDate,
+                    scrollToTime = scrollToCurrentTime,
+                    onScrollCompleted = { viewModel.onScrollCompleted() },
+                    onEntryClick = { entry, activity ->
+                        selectedEntry = Pair(entry, activity)
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+
+    // Диалоги и Bottom Sheets
+    if (showAddDialog) {
+        AddActivityDialog(
+            onDismiss = { showAddDialog = false },
+            onConfirm = { name ->
+                viewModel.createAndStartActivity(name)
+                showAddDialog = false
+            }
+        )
+    }
+
+    selectedEntry?.let { (entry, activity) ->
+        ActivityBottomSheet(
+            entry = entry,
+            activity = activity,
+            isActive = activeEntries.any { it.id == entry.id },
+            onDismiss = { selectedEntry = null }
+        )
+    }
+}
