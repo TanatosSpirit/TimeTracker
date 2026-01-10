@@ -2,8 +2,6 @@
 package com.example.timetracker.presentation
 
 import android.content.Context
-import androidx.compose.ui.graphics.Color
-import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.timetracker.data.local.entities.ActivityEntity
@@ -12,6 +10,7 @@ import com.example.timetracker.data.repository.TimeTrackerRepository
 import com.example.timetracker.presentation.widget.TimeTrackerWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import androidx.glance.appwidget.updateAll
+import com.example.timetracker.domain.model.HourSegment
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -39,20 +38,23 @@ class MainViewModel @Inject constructor(
     val timeEntries = currentDateString.flatMapLatest { dateStr ->
         repository.getEntriesByDate(dateStr)
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    val hourSegments: StateFlow<List<HourSegment>> =
+        combine(timeEntries, selectedDate) { entries, date ->
+
+            val now = System.currentTimeMillis()
+            entries.flatMap { entry ->
+                splitEntryToHourSegments(entry, date, now)
+            }
+
+        }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     
     val activities = repository.getAllActivities()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
     
     val activeEntries = repository.getActiveEntries()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-    
-//    fun createAndStartActivity(name: String) {
-//        viewModelScope.launch {
-//            val color = generateRandomColor()
-//            val activityId = repository.createActivity(name, color)
-//            repository.startActivity(activityId)
-//        }
-//    }
+
     init {
         _scrollToCurrentTime.value = System.currentTimeMillis()
     }
@@ -90,15 +92,6 @@ class MainViewModel @Inject constructor(
         _scrollToCurrentTime.value = null
     }
 
-//    fun updateWidget(context: Context) {
-//        viewModelScope.launch {
-//            val manager = GlanceAppWidgetManager(context)
-//            val glanceIds = manager.getGlanceIds(TimeTrackerWidget::class.java)
-//            glanceIds.forEach { glanceId ->
-//                TimeTrackerWidget().update(context, glanceId)
-//            }
-//        }
-//    }
     fun updateWidget(context: Context) {
         viewModelScope.launch {
             TimeTrackerWidget().updateAll(context)
@@ -114,6 +107,48 @@ class MainViewModel @Inject constructor(
         )
         return colors[Random.nextInt(colors.size)]
     }
+    private fun splitEntryToHourSegments(
+        entry: TimeEntryEntity,
+        selectedDate: Date,
+        now: Long
+    ): List<HourSegment> {
+
+        val endTime = entry.endTime ?: now
+        val calendar = Calendar.getInstance()
+        calendar.time = selectedDate
+
+        val result = mutableListOf<HourSegment>()
+
+        for (hour in 0..23) {
+            calendar.set(Calendar.HOUR_OF_DAY, hour)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+
+            val hourStart = calendar.timeInMillis
+            val hourEnd = hourStart + 60 * 60 * 1000
+
+            if (entry.startTime < hourEnd && endTime > hourStart) {
+                val segmentStart = maxOf(entry.startTime, hourStart)
+                val segmentEnd = minOf(endTime, hourEnd)
+
+                val startMinute = ((segmentStart - hourStart) / 60000).toInt()
+                val endMinute = ((segmentEnd - hourStart) / 60000)
+                    .toInt()
+                    .coerceAtLeast(startMinute + 1)
+
+                result += HourSegment(
+                    entry = entry,
+                    hour = hour,
+                    startMinute = startMinute,
+                    endMinute = endMinute
+                )
+            }
+        }
+
+        return result
+    }
+
 }
 
 // Domain models for UI

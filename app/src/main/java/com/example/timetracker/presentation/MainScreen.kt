@@ -6,7 +6,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import com.example.timetracker.ui.theme.TimeTrackerTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
@@ -28,18 +27,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.unit.offset
 import java.util.Calendar
+import com.example.timetracker.domain.model.HourSegment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
     val selectedDate by viewModel.selectedDate.collectAsState()
-    val timeEntries by viewModel.timeEntries.collectAsState()
+    val hourSegments by viewModel.hourSegments.collectAsState()
     val activities by viewModel.activities.collectAsState()
     val activeEntries by viewModel.activeEntries.collectAsState()
     val scrollToCurrentTime by viewModel.scrollToCurrentTime.collectAsState()
@@ -73,7 +69,7 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                 )
 
                 DayTimeline(
-                    timeEntries = timeEntries,
+                    hourSegments = hourSegments,
                     activities = activities,
                     activeEntries = activeEntries,
                     selectedDate = selectedDate,
@@ -137,57 +133,9 @@ fun DateNavigationBar(
     }
 }
 
-//@Composable
-//fun DayTimeline(
-//    timeEntries: List<TimeEntryEntity>,
-//    activities: List<ActivityEntity>,
-//    activeEntries: List<TimeEntryEntity>,
-//    selectedDate: Date,
-//    modifier: Modifier = Modifier,
-//    scrollToTime: Long? = null,
-//    onScrollCompleted: () -> Unit = {}
-//) {
-//    val activitiesMap = activities.associateBy { it.id }
-//
-//    // Группируем пересекающиеся активности
-//    val entryGroups = groupOverlappingEntries(timeEntries)
-//
-//    val listState = rememberLazyListState()
-//    LaunchedEffect(scrollToTime) {
-//        scrollToTime?.let { timestamp ->
-//            val calendar = Calendar.getInstance()
-//            calendar.timeInMillis = timestamp
-//            val hour = calendar.get(Calendar.HOUR_OF_DAY)
-//            val minute = calendar.get(Calendar.MINUTE)
-//
-//            // Вычисляем индекс для центрирования
-//            // Пытаемся центрировать, но ограничиваем диапазон [0, 23]
-//            val targetIndex = (hour - 2).coerceIn(0, 23)
-//
-//            listState.animateScrollToItem(targetIndex)
-//            onScrollCompleted()
-//        }
-//    }
-//
-//    LazyColumn(modifier = modifier.fillMaxSize(),
-//        state = listState)
-//    {
-//        items(24) { hour ->
-//            HourRow(
-//                hour = hour,
-//                entryGroups = entryGroups,
-//                activitiesMap = activitiesMap,
-//                activeEntries = activeEntries,
-//                selectedDate = selectedDate,
-//                currentTime = if (isToday(selectedDate)) System.currentTimeMillis() else null
-//            )
-//        }
-//    }
-//}
-
 @Composable
 fun DayTimeline(
-    timeEntries: List<TimeEntryEntity>,
+    hourSegments: List<HourSegment>,
     activities: List<ActivityEntity>,
     activeEntries: List<TimeEntryEntity>,
     selectedDate: Date,
@@ -196,21 +144,14 @@ fun DayTimeline(
     onScrollCompleted: () -> Unit = {}
 ) {
     val activitiesMap = activities.associateBy { it.id }
-
-    // УДАЛИТЬ эту строку:
-    // val entryGroups = groupOverlappingEntries(timeEntries)
-
     val listState = rememberLazyListState()
+
     LaunchedEffect(scrollToTime) {
         scrollToTime?.let { timestamp ->
             val calendar = Calendar.getInstance()
             calendar.timeInMillis = timestamp
             val hour = calendar.get(Calendar.HOUR_OF_DAY)
-            val minute = calendar.get(Calendar.MINUTE)
-
-            val targetIndex = (hour - 2).coerceIn(0, 23)
-
-            listState.animateScrollToItem(targetIndex)
+            listState.animateScrollToItem((hour - 2).coerceIn(0, 23))
             onScrollCompleted()
         }
     }
@@ -219,7 +160,7 @@ fun DayTimeline(
         items(24) { hour ->
             HourRow(
                 hour = hour,
-                timeEntries = timeEntries,  // ИЗМЕНИТЬ: передаем timeEntries вместо entryGroups
+                segments = hourSegments.filter { it.hour == hour },
                 activitiesMap = activitiesMap,
                 activeEntries = activeEntries,
                 selectedDate = selectedDate,
@@ -233,35 +174,6 @@ private fun isToday(date: Date): Boolean {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     return dateFormat.format(date) == dateFormat.format(Date())
 }
-
-// Группируем записи, которые пересекаются по времени
-//private fun groupOverlappingEntries(entries: List<TimeEntryEntity>): List<List<TimeEntryEntity>> {
-//    if (entries.isEmpty()) return emptyList()
-//
-//    val sorted = entries.sortedBy { it.startTime }
-//    val groups = mutableListOf<MutableList<TimeEntryEntity>>()
-//
-//    sorted.forEach { entry ->
-//        val entryEnd = entry.endTime ?: System.currentTimeMillis()
-//
-//        // Ищем группу, с которой пересекается эта запись
-//        val overlappingGroup = groups.find { group ->
-//            group.any { existing ->
-//                val existingEnd = existing.endTime ?: System.currentTimeMillis()
-//                // Проверяем пересечение
-//                entry.startTime < existingEnd && entryEnd > existing.startTime
-//            }
-//        }
-//
-//        if (overlappingGroup != null) {
-//            overlappingGroup.add(entry)
-//        } else {
-//            groups.add(mutableListOf(entry))
-//        }
-//    }
-//
-//    return groups
-//}
 
 private fun calculateOverlapLevels(
     entries: List<TimeEntryEntity>,
@@ -293,317 +205,69 @@ private fun calculateOverlapLevels(
     }
 }
 
-
-//@Composable
-//fun HourRow(
-//    hour: Int,
-//    entryGroups: List<List<TimeEntryEntity>>,
-//    activitiesMap: Map<Long, ActivityEntity>,
-//    activeEntries: List<TimeEntryEntity>,
-//    selectedDate: Date,
-//    currentTime: Long? = null
-//) {
-//    val hourStart = getHourTimestamp(selectedDate, hour)
-//    val hourEnd = getHourTimestamp(selectedDate, hour + 1)
-//    val hourDuration = hourEnd - hourStart
-//
-//    val currentTimePosition = currentTime?.let {
-//        if (it in hourStart until hourEnd) {
-//            (it - hourStart).toFloat() / hourDuration
-//        } else null
-//    }
-//
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .height(160.dp)  // УВЕЛИЧИЛИ В 2 РАЗА для лучшей детализации
-//            .padding(horizontal = 8.dp)
-//    ) {
-//        // Hour label
-//        Text(
-//            text = String.format("%02d:00", hour),
-//            modifier = Modifier
-//                .width(60.dp)
-//                .padding(top = 4.dp),
-//            fontSize = 12.sp,
-//            color = Color.Gray
-//        )
-//
-//        Box(  // ИЗМЕНИТЬ с Row на Box
-//            modifier = Modifier
-//                .weight(1f)
-//                .fillMaxHeight()
-//                .background(MaterialTheme.colorScheme.surface)
-//        ) {
-//            // Timeline area - используем Row для горизонтального размещения групп
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxHeight()
-//            ) {
-//                entryGroups.forEach { group ->
-//                    // Проверяем, пересекается ли хоть одна запись из группы с этим часом
-//                    val entriesInThisHour = group.filter { entry ->
-//                        val entryEnd = entry.endTime ?: System.currentTimeMillis()
-//                        entry.startTime < hourEnd && entryEnd > hourStart
-//                    }
-//
-//                    if (entriesInThisHour.isNotEmpty()) {
-//                        // Каждая группа занимает равную долю ширины
-//                        Column(
-//                            modifier = Modifier
-//                                .weight(1f)
-//                                .fillMaxHeight()
-//                        ) {
-//                            entriesInThisHour.forEach { entry ->
-//                                val activity = activitiesMap[entry.activityId]
-//                                if (activity != null) {
-//                                    val entryEnd = entry.endTime ?: System.currentTimeMillis()
-//                                    val isActive = activeEntries.any { it.id == entry.id }
-//
-//                                    // Вычисляем видимую часть в пределах текущего часа
-//                                    val segmentStart = max(entry.startTime, hourStart)
-//                                    val segmentEnd = min(entryEnd, hourEnd)
-//
-//                                    // Позиция начала сегмента относительно начала часа (0.0 - 1.0)
-//                                    val startFraction =
-//                                        (segmentStart - hourStart).toFloat() / hourDuration
-//
-//                                    // Длина сегмента относительно часа (0.0 - 1.0)
-//                                    val lengthFraction =
-//                                        (segmentEnd - segmentStart).toFloat() / hourDuration
-//
-//                                    TimeEntrySegment(
-//                                        activity = activity,
-//                                        entry = entry,
-//                                        isActive = isActive,
-//                                        startFraction = startFraction,
-//                                        lengthFraction = lengthFraction,
-//                                        hourHeightDp = 160.dp  // Передаем высоту для расчетов
-//                                    )
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            // ДОБАВИТЬ красную линию текущего времени
-//            currentTimePosition?.let { position ->
-//                Canvas(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(2.dp)
-//                        .offset(y = (160.dp * position))
-//                ) {
-//                    drawLine(
-//                        color = Color.Red,
-//                        start = Offset(0f, 0f),
-//                        end = Offset(size.width, 0f),
-//                        strokeWidth = 4f,
-//                        pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-//                    )
-//                }
-//            }
-//        }
-//    }
-//
-//    Divider(color = Color.LightGray, thickness = 0.5.dp)
-//}
-
 @Composable
 fun HourRow(
     hour: Int,
-    timeEntries: List<TimeEntryEntity>,
+    segments: List<HourSegment>,
     activitiesMap: Map<Long, ActivityEntity>,
     activeEntries: List<TimeEntryEntity>,
     selectedDate: Date,
-    currentTime: Long? = null
+    currentTime: Long?
 ) {
-    val hourStart = getHourTimestamp(selectedDate, hour)
-    val hourEnd = getHourTimestamp(selectedDate, hour + 1)
-    val hourDuration = hourEnd - hourStart
+    val hourHeightDp = 160.dp
 
-    val entryLevels = calculateOverlapLevels(timeEntries, hourStart, hourEnd)
-    val maxOverlaps = entryLevels.maxOfOrNull { it.second } ?: 0
-    val columns = maxOverlaps + 1 // Количество столбцов = максимум пересечений + 1
-
-    val currentTimePosition = currentTime?.let {
-        if (it in hourStart until hourEnd) {
-            (it - hourStart).toFloat() / hourDuration
-        } else null
-    }
+    // Группируем по entry — каждая активность своя колонка
+    val groupedByEntry = segments.groupBy { it.entry.id }
+    val columns = groupedByEntry.values.toList()
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(160.dp)
+            .height(hourHeightDp)
             .padding(horizontal = 8.dp)
     ) {
         Text(
             text = String.format("%02d:00", hour),
-            modifier = Modifier
-                .width(60.dp)
-                .padding(top = 4.dp),
+            modifier = Modifier.width(60.dp),
             fontSize = 12.sp,
             color = Color.Gray
         )
 
-//        Box(
-//            modifier = Modifier
-//                .weight(1f)
-//                .fillMaxHeight()
-//                .background(MaterialTheme.colorScheme.surface)
-//        ) {
-//            // Для каждой записи определяем её колонку
-//            entryLevels.forEach { (entry, _) ->
-//                val activity = activitiesMap[entry.activityId] ?: return@forEach
-//                val entryEnd = entry.endTime ?: System.currentTimeMillis()
-//                val isActive = activeEntries.any { it.id == entry.id }
-//
-//                // Находим свободную колонку для этой записи
-//                val columnIndex = findFreeColumn(entry, entryLevels, hourStart, hourEnd)
-//
-//                val segmentStart = max(entry.startTime, hourStart)
-//                val segmentEnd = min(entryEnd, hourEnd)
-//
-//                val startFraction = (segmentStart - hourStart).toFloat() / hourDuration
-//                val lengthFraction = (segmentEnd - segmentStart).toFloat() / hourDuration
-//
-//                // Вычисляем ширину и offset для колонки
-//                val columnWidth = 1f / columns
-//                val columnOffset = columnIndex * columnWidth
-//
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxWidth(columnWidth)
-//                        .fillMaxHeight()
-//                        .offset(x = (columnOffset * 100).dp) // Примерное смещение
-//                ) {
-//                    Column(modifier = Modifier.fillMaxSize()) {
-//                        TimeEntrySegment(
-//                            activity = activity,
-//                            entry = entry,
-//                            isActive = isActive,
-//                            startFraction = startFraction,
-//                            lengthFraction = lengthFraction,
-//                            hourHeightDp = 160.dp
-//                        )
-//                    }
-//                }
-//            }
-//
-//            currentTimePosition?.let { position ->
-//                Canvas(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(2.dp)
-//                        .offset(y = (160.dp * position))
-//                ) {
-//                    drawLine(
-//                        color = Color.Red,
-//                        start = Offset(0f, 0f),
-//                        end = Offset(size.width, 0f),
-//                        strokeWidth = 4f,
-//                        pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-//                    )
-//                }
-//            }
-//        }
-        Box(
+        Row(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
-                .background(MaterialTheme.colorScheme.surface)
         ) {
-            // Если нет записей - пустой Box
-            if (entryLevels.isEmpty()) {
-                // Пусто
-            } else {
-                // Используем Row для горизонтального размещения колонок
-                Row(modifier = Modifier.fillMaxSize()) {
-                    // Создаем columns количество колонок
-                    repeat(columns) { columnIndex ->
-                        // Находим все записи для этой колонки
-                        val entriesInColumn = entryLevels.filter { (entry, _) ->
-                            findFreeColumn(entry, entryLevels, hourStart, hourEnd) == columnIndex
-                        }
-
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)  // Равномерное распределение
-                                .fillMaxHeight()
-                        ) {
-                            entriesInColumn.forEach { (entry, _) ->
-                                val activity = activitiesMap[entry.activityId] ?: return@forEach
-                                val entryEnd = entry.endTime ?: System.currentTimeMillis()
-                                val isActive = activeEntries.any { it.id == entry.id }
-
-                                val segmentStart = max(entry.startTime, hourStart)
-                                val segmentEnd = min(entryEnd, hourEnd)
-
-                                val startFraction = (segmentStart - hourStart).toFloat() / hourDuration
-                                val lengthFraction = (segmentEnd - segmentStart).toFloat() / hourDuration
-
-                                TimeEntrySegment(
-                                    activity = activity,
-                                    entry = entry,
-                                    isActive = isActive,
-                                    startFraction = startFraction,
-                                    lengthFraction = lengthFraction,
-                                    hourHeightDp = 160.dp
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Красная линия текущего времени
-            currentTimePosition?.let { position ->
-                Canvas(
+            columns.forEach { entrySegments ->
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.dp)
-                        .offset(y = (160.dp * position))
+                        .weight(1f)
+                        .fillMaxHeight()
                 ) {
-                    drawLine(
-                        color = Color.Red,
-                        start = Offset(0f, 0f),
-                        end = Offset(size.width, 0f),
-                        strokeWidth = 4f,
-                        pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
-                    )
+                    entrySegments.forEach { segment ->
+                        val entry = segment.entry
+                        val activity = activitiesMap[entry.activityId] ?: return@forEach
+
+                        val startFraction = segment.startMinute / 60f
+                        val lengthFraction =
+                            (segment.endMinute - segment.startMinute) / 60f
+
+                        TimeEntrySegment(
+                            activity = activity,
+                            entry = entry,
+                            isActive = activeEntries.any { it.id == entry.id },
+                            startFraction = startFraction,
+                            lengthFraction = lengthFraction,
+                            hourHeightDp = hourHeightDp
+                        )
+                    }
                 }
             }
         }
     }
 
-    Divider(color = Color.LightGray, thickness = 0.5.dp)
+    Divider(thickness = 0.5.dp)
 }
-
-private fun findFreeColumn(
-    entry: TimeEntryEntity,
-    entryLevels: List<Pair<TimeEntryEntity, Int>>,
-    hourStart: Long,
-    hourEnd: Long
-): Int {
-    val entryEnd = entry.endTime ?: System.currentTimeMillis()
-    val entryStartInHour = max(entry.startTime, hourStart)
-    val entryEndInHour = min(entryEnd, hourEnd)
-
-    // Простая стратегия: берем индекс по порядку старта
-    val sortedEntries = entryLevels.map { it.first }.sortedBy { it.startTime }
-    val overlappingEntries = sortedEntries.filter { other ->
-        val otherEnd = other.endTime ?: System.currentTimeMillis()
-        val otherStartInHour = max(other.startTime, hourStart)
-        val otherEndInHour = min(otherEnd, hourEnd)
-
-        entryStartInHour < otherEndInHour && entryEndInHour > otherStartInHour
-    }
-
-    return overlappingEntries.indexOf(entry).coerceAtLeast(0)
-}
-
-
 
 @Composable
 fun ColumnScope.TimeEntrySegment(
