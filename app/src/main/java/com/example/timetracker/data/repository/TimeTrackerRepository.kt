@@ -20,9 +20,7 @@ class TimeTrackerRepository @Inject constructor(
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     
     fun getAllActivities(): Flow<List<ActivityEntity>> = activityDao.getAllActivities()
-    fun getTopActivities(): Flow<List<ActivityEntity>> = activityDao.getTopActivities()
     fun getActiveEntries(): Flow<List<TimeEntryEntity>> = timeEntryDao.getActiveEntries()
-//    fun getEntriesByDate(date: String): Flow<List<TimeEntryEntity>> = timeEntryDao.getEntriesByDate(date)
     fun getEntriesByDate(date: String): Flow<List<TimeEntryEntity>> {
         // Вычисляем timestamp начала дня для проверки пересечений
         val calendar = Calendar.getInstance()
@@ -36,12 +34,7 @@ class TimeTrackerRepository @Inject constructor(
 
         return timeEntryDao.getEntriesByDate(date, dayStartTime)
     }
-    
-//    suspend fun createActivity(name: String, color: Long): Long {
-//        return activityDao.insert(
-//            ActivityEntity(name = name, color = color)
-//        )
-//    }
+
     suspend fun createActivity(name: String, color: Long, lastUsedAt: Long = System.currentTimeMillis()): Long {
         return activityDao.insert(
             ActivityEntity(

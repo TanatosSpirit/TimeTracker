@@ -10,11 +10,6 @@ interface ActivityDao {
     @Query("SELECT * FROM activities ORDER BY usageCount DESC, lastUsedAt DESC")
     fun getAllActivities(): Flow<List<ActivityEntity>>
     
-    @Query("SELECT * FROM activities ORDER BY usageCount DESC, lastUsedAt DESC LIMIT 6")
-    fun getTopActivities(): Flow<List<ActivityEntity>>
-//    @Query("SELECT * FROM activities ORDER BY id DESC LIMIT 6")
-//    fun getTopActivities(): Flow<List<ActivityEntity>>
-    
     @Query("SELECT * FROM activities WHERE id = :id")
     suspend fun getActivityById(id: Long): ActivityEntity?
     

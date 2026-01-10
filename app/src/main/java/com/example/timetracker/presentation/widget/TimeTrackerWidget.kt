@@ -21,12 +21,13 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.example.timetracker.data.local.database.AppDatabase
 import com.example.timetracker.data.repository.TimeTrackerRepository
-import com.example.timetracker.presentation.MainActivity
 import com.example.timetracker.presentation.QuickEntryActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import androidx.glance.action.actionParametersOf
+import androidx.glance.appwidget.lazy.LazyColumn
+import androidx.glance.appwidget.lazy.items
 
 class TimeTrackerWidget : GlanceAppWidget() {
     
@@ -36,24 +37,18 @@ class TimeTrackerWidget : GlanceAppWidget() {
             database.activityDao(),
             database.timeEntryDao()
         )
-        
-        val topActivities = withContext(Dispatchers.IO) {
-            repository.getTopActivities().first()
+
+        val allActivities = withContext(Dispatchers.IO) {
+            repository.getAllActivities().first()
         }
 
-        // Добавьте логирование:
-        android.util.Log.d("TimeTrackerWidget", "topActivities size: ${topActivities.size}")
-        topActivities.forEach { activity ->
-            android.util.Log.d("TimeTrackerWidget", "Activity: id=${activity.id}, name=${activity.name}, usageCount=${activity.usageCount}, lastUsedAt=${activity.lastUsedAt}")
-        }
-        
         val activeEntries = withContext(Dispatchers.IO) {
             repository.getActiveEntries().first()
         }
         
         provideContent {
             WidgetContent(
-                topActivities = topActivities.map { 
+                allActivities = allActivities.map {
                     ActivityItem(it.id, it.name, it.color) 
                 },
                 activeActivityIds = activeEntries.map { it.activityId }.toSet(),
@@ -67,7 +62,7 @@ data class ActivityItem(val id: Long, val name: String, val color: Long)
 
 @Composable
 fun WidgetContent(
-    topActivities: List<ActivityItem>,
+    allActivities: List<ActivityItem>,
     activeActivityIds: Set<Long>,
     context: Context
 ) {
@@ -75,9 +70,9 @@ fun WidgetContent(
         modifier = GlanceModifier
             .fillMaxSize()
             .padding(12.dp)
-//            .background(Color.White)
             .background(ColorProvider(Color.White, Color(0xFF1E1E1E)))
     ) {
+        // Заголовок + кнопка "+"
         Row(
             modifier = GlanceModifier.fillMaxWidth(),
             horizontalAlignment = Alignment.Horizontal.CenterHorizontally,
@@ -91,7 +86,7 @@ fun WidgetContent(
                 ),
                 modifier = GlanceModifier.defaultWeight()
             )
-            
+
             Box(
                 modifier = GlanceModifier
                     .size(32.dp)
@@ -112,36 +107,27 @@ fun WidgetContent(
                 )
             }
         }
-        
+
         Spacer(modifier = GlanceModifier.height(8.dp))
-        
-        // Top 6 activities
-        topActivities.take(6).forEach { activity ->
-            val isActive = activity.id in activeActivityIds
-            ActivityButton(
-                activity = activity,
-                isActive = isActive
-            )
-            Spacer(modifier = GlanceModifier.height(4.dp))
-        }
-        
-        // "More" button
-        Box(
+
+        LazyColumn(
             modifier = GlanceModifier
-                .fillMaxWidth()
-                .height(36.dp)
-                .background(Color(0xFFE0E0E0))
-                .cornerRadius(8.dp)
-                .clickable(actionStartActivity(
-                    Intent(context, QuickEntryActivity::class.java)
-                )),
-            contentAlignment = Alignment.Center
+                .defaultWeight()  // Занимает оставшееся место
+            // .fillMaxHeight() — если нужно жёстко
         ) {
-            Text(
-                text = "More...",
-                style = TextStyle(fontSize = 14.sp)
-            )
+            items(allActivities) { activity ->  // DSL: items(список) { item -> ... }
+                val isActive = activity.id in activeActivityIds
+                ActivityButton(
+                    activity = activity,
+                    isActive = isActive
+                )
+                // Spacer между кнопками — внутри LazyColumn (не считается ребёнком главного Column)
+                Spacer(modifier = GlanceModifier.height(4.dp))
+            }
         }
+
+        // "More" button
+        // Box(...) { ... }
     }
 }
 
@@ -189,12 +175,3 @@ fun ActivityButton(
         }
     }
 }
-
-// Extension for AppDatabase singleton
-//private fun AppDatabase.Companion.getInstance(context: Context): AppDatabase {
-//    return androidx.room.Room.databaseBuilder(
-//        context.applicationContext,
-//        AppDatabase::class.java,
-//        "time_tracker_database"
-//    ).build()
-//}
