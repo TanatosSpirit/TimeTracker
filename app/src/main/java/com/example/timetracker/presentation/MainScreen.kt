@@ -28,6 +28,7 @@ import java.util.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import java.util.Calendar
 import com.example.timetracker.domain.model.HourSegment
+import androidx.compose.foundation.clickable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +41,9 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
 
     var showAddDialog by remember { mutableStateOf(false) }
     val isDarkTheme = isSystemInDarkTheme()
+
+    var selectedEntry by remember { mutableStateOf<Pair<TimeEntryEntity, ActivityEntity>?>(null) }
+    val showBottomSheet = selectedEntry != null
 
     TimeTrackerTheme(darkTheme = isDarkTheme) {
         Scaffold(
@@ -73,6 +77,9 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                     selectedDate = selectedDate,
                     scrollToTime = scrollToCurrentTime,
                     onScrollCompleted = { viewModel.onScrollCompleted() },
+                    onEntryClick = { entry, activity ->
+                        selectedEntry = Pair(entry, activity)
+                    },
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -86,6 +93,15 @@ fun MainScreen(viewModel: MainViewModel = hiltViewModel()) {
                 viewModel.createAndStartActivity(name)
                 showAddDialog = false
             }
+        )
+    }
+
+    if (showBottomSheet && selectedEntry != null) {
+        ActivityBottomSheet(
+            entry = selectedEntry!!.first,
+            activity = selectedEntry!!.second,
+            isActive = activeEntries.any { it.id == selectedEntry!!.first.id },
+            onDismiss = { selectedEntry = null }
         )
     }
 }
@@ -139,7 +155,8 @@ fun DayTimeline(
     selectedDate: Date,
     modifier: Modifier = Modifier,
     scrollToTime: Long? = null,
-    onScrollCompleted: () -> Unit = {}
+    onScrollCompleted: () -> Unit = {},
+    onEntryClick: (TimeEntryEntity, ActivityEntity) -> Unit = { _, _ -> }
 ) {
     val activitiesMap = activities.associateBy { it.id }
     val listState = rememberLazyListState()
@@ -162,7 +179,8 @@ fun DayTimeline(
                 activitiesMap = activitiesMap,
                 activeEntries = activeEntries,
                 selectedDate = selectedDate,
-                currentTime = if (isToday(selectedDate)) System.currentTimeMillis() else null
+                currentTime = if (isToday(selectedDate)) System.currentTimeMillis() else null,
+                onEntryClick = onEntryClick
             )
         }
     }
@@ -180,7 +198,8 @@ fun HourRow(
     activitiesMap: Map<Long, ActivityEntity>,
     activeEntries: List<TimeEntryEntity>,
     selectedDate: Date,
-    currentTime: Long?
+    currentTime: Long?,
+    onEntryClick: (TimeEntryEntity, ActivityEntity) -> Unit = { _, _ -> }
 ) {
     val hourHeightDp = 160.dp
 
@@ -226,7 +245,8 @@ fun HourRow(
                             isActive = activeEntries.any { it.id == entry.id },
                             startFraction = startFraction,
                             lengthFraction = lengthFraction,
-                            hourHeightDp = hourHeightDp
+                            hourHeightDp = hourHeightDp,
+                            onClick = { onEntryClick(entry, activity) }
                         )
                     }
                 }
@@ -237,6 +257,78 @@ fun HourRow(
     Divider(thickness = 0.5.dp)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ActivityBottomSheet(
+    entry: TimeEntryEntity,
+    activity: ActivityEntity,
+    isActive: Boolean,
+    onDismiss: () -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState()
+    val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+
+    // Для активных обновляем время
+    var currentTime by remember { mutableStateOf(System.currentTimeMillis()) }
+
+    LaunchedEffect(isActive) {
+        if (isActive) {
+            while (true) {
+                delay(1000)
+                currentTime = System.currentTimeMillis()
+            }
+        }
+    }
+
+    val startTimeText = timeFormat.format(Date(entry.startTime))
+    val endTimeText = if (isActive) {
+        "..."
+    } else {
+        entry.endTime?.let { timeFormat.format(Date(it)) } ?: "..."
+    }
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .padding(bottom = 32.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = activity.name,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = "$startTimeText - $endTimeText",
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
+            }
+
+            // Можно добавить дополнительную информацию
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (isActive) {
+                Text(
+                    text = "Active now ⏱",
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    }
+}
+
 @Composable
 fun ColumnScope.TimeEntrySegment(
     activity: ActivityEntity,
@@ -244,7 +336,8 @@ fun ColumnScope.TimeEntrySegment(
     isActive: Boolean,
     startFraction: Float,
     lengthFraction: Float,
-    hourHeightDp: Dp = 160.dp  // НОВЫЙ ПАРАМЕТР
+    hourHeightDp: Dp = 160.dp,
+    onClick: () -> Unit = {}
 ) {
     // Для активных записей обновляем время каждую секунду
     var currentTime by remember { mutableStateOf(System.currentTimeMillis()) }
@@ -284,6 +377,7 @@ fun ColumnScope.TimeEntrySegment(
             .fillMaxWidth()
             .height(segmentHeightDp)  // ТОЧНАЯ ВЫСОТА вместо weight
             .background(Color(activity.color))
+            .clickable(onClick = onClick)
             .padding(6.dp),
         contentAlignment = Alignment.TopStart
     ) {
