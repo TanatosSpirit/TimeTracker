@@ -4,6 +4,7 @@ package com.example.timetracker.presentation.widget
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,9 +23,7 @@ import androidx.glance.text.TextStyle
 import com.example.timetracker.data.local.database.AppDatabase
 import com.example.timetracker.data.repository.TimeTrackerRepositoryImpl
 import com.example.timetracker.presentation.QuickEntryActivity
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.withContext
+import androidx.compose.runtime.getValue
 import androidx.glance.action.actionParametersOf
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
@@ -38,20 +37,22 @@ class TimeTrackerWidget : GlanceAppWidget() {
             database.timeEntryDao()
         )
 
-        val allActivities = withContext(Dispatchers.IO) {
-            repository.getAllActivities().first()
-        }
+        // Получаем Flow напрямую из репозитория
+        val activitiesFlow = repository.getAllActivities()
+        val activeEntriesFlow = repository.getActiveEntries()
 
-        val activeEntries = withContext(Dispatchers.IO) {
-            repository.getActiveEntries().first()
-        }
-        
         provideContent {
+            // Превращаем Flow в State. Glance автоматически подпишется на изменения в Room.
+            val allActivities by activitiesFlow.collectAsState(initial = emptyList())
+            val activeEntries by activeEntriesFlow.collectAsState(initial = emptyList())
+
+            val activeActivityIds = activeEntries.map { it.activityId }.toSet()
+
             WidgetContent(
                 allActivities = allActivities.map {
                     ActivityItem(it.id, it.name, it.color) 
                 },
-                activeActivityIds = activeEntries.map { it.activityId }.toSet(),
+                activeActivityIds = activeActivityIds,
                 context = context
             )
         }

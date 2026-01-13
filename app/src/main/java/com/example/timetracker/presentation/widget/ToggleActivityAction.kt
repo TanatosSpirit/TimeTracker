@@ -5,7 +5,6 @@ import android.content.Context
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
-import androidx.glance.appwidget.updateAll
 import com.example.timetracker.data.local.database.AppDatabase
 import com.example.timetracker.data.repository.TimeTrackerRepositoryImpl
 import kotlinx.coroutines.Dispatchers
@@ -30,10 +29,13 @@ class ToggleActivityAction : ActionCallback {
             database.timeEntryDao()
         )
 
+        // Просто меняем данные в БД.
+        // Flow сам "протолкнет" изменения в виджет.
         withContext(Dispatchers.IO) {
             repository.toggleActivity(activityId)
         }
 
-        TimeTrackerWidget().updateAll(context)
+        // updateAll(context) БОЛЬШЕ НЕ НУЖЕН
+        TimeTrackerWidget().update(context, glanceId)
     }
 }
