@@ -1,7 +1,11 @@
 // presentation/features/timeline/components/ActivityBottomSheet.kt
 package com.example.timetracker.presentation.features.timeline.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,7 +26,8 @@ fun ActivityBottomSheet(
     activity: Activity,
     isActive: Boolean,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDeleteClick: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState()
 
@@ -81,6 +86,24 @@ fun ActivityBottomSheet(
                     text = "Active now ⏱",
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            IconButton(
+                onClick = onDeleteClick,
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.errorContainer,
+                        shape = CircleShape
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Удалить запись",
+                    tint = MaterialTheme.colorScheme.onErrorContainer
                 )
             }
         }

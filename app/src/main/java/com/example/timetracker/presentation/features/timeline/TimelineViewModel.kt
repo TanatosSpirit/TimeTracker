@@ -3,12 +3,15 @@ package com.example.timetracker.presentation.features.timeline
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.timetracker.data.local.entities.TimeEntryEntity
 import com.example.timetracker.domain.model.HourSegment
 import com.example.timetracker.domain.usecase.activity.*
+import com.example.timetracker.domain.usecase.entry.DeleteTimeEntryUseCase
 import com.example.timetracker.domain.usecase.entry.GetEntriesByDateUseCase
 import com.example.timetracker.domain.usecase.entry.SplitEntryToSegmentsUseCase
 import com.example.timetracker.presentation.common.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
@@ -21,7 +24,8 @@ class TimelineViewModel @Inject constructor(
     private val getEntriesByDateUseCase: GetEntriesByDateUseCase,
     private val createActivityUseCase: CreateActivityUseCase,
     private val startActivityUseCase: StartActivityUseCase,
-    private val splitEntryToSegmentsUseCase: SplitEntryToSegmentsUseCase
+    private val splitEntryToSegmentsUseCase: SplitEntryToSegmentsUseCase,
+    private val deleteTimeEntryUseCase: DeleteTimeEntryUseCase
 ) : ViewModel() {
 
     // ========== State ==========
@@ -102,5 +106,11 @@ class TimelineViewModel @Inject constructor(
      */
     fun onScrollCompleted() {
         _scrollToCurrentTime.value = null
+    }
+
+    fun deleteEntry(entryId: Long?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteTimeEntryUseCase(entryId)
+        }
     }
 }

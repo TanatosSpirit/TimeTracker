@@ -7,6 +7,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.timetracker.domain.model.Activity
@@ -30,6 +32,9 @@ fun TimelineScreen(
     var selectedEntry by remember { mutableStateOf<Pair<TimeEntry, Activity>?>(null) }
 
     val isDarkTheme = isSystemInDarkTheme()
+
+    // 1. Состояние в начале TimelineScreen
+    var entryToDelete by remember { mutableStateOf<Long?>(null) }
 
     TimeTrackerTheme(darkTheme = isDarkTheme) {
         Scaffold(
@@ -88,7 +93,37 @@ fun TimelineScreen(
             entry = entry,
             activity = activity,
             isActive = activeEntries.any { it.id == entry.id },
-            onDismiss = { selectedEntry = null }
+            onDismiss = { selectedEntry = null },
+            onDeleteClick = { entryToDelete = entry.id }
         )
     }
+
+    entryToDelete?.let { entryId ->
+        AlertDialog(
+            onDismissRequest = { entryToDelete = null },
+            title = { Text("Удалить запись?") },
+            text = { Text("Это действие нельзя будет отменить.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.deleteEntry(entryId)
+                        entryToDelete = null
+                        selectedEntry = null // Закрываем BottomSheet при подтверждении
+                    }
+                ) {
+                    Text(
+                        text = "Удалить",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { entryToDelete = null }) {
+                    Text("Отмена")
+                }
+            }
+        )
+    }
+
+
 }

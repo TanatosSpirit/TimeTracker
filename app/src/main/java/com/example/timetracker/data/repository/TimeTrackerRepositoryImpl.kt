@@ -107,4 +107,8 @@ class TimeTrackerRepositoryImpl @Inject constructor(
             timeEntryDao.update(entry.copy(endTime = System.currentTimeMillis()))
         }
     }
+
+    override suspend fun deleteTimeEntry(entryId: Long?) {
+        timeEntryDao.delete(entryId)
+    }
 }
