@@ -111,4 +111,17 @@ class TimeTrackerRepositoryImpl @Inject constructor(
     override suspend fun deleteTimeEntry(entryId: Long?) {
         timeEntryDao.delete(entryId)
     }
+
+    override suspend fun updateEntryTimes(entryId: Long, startTime: Long, endTime: Long?) {
+        val currentEntry = timeEntryDao.getEntryById(entryId)
+
+        currentEntry?.let { entry ->
+            val updatedEntry = entry.copy(
+                startTime = startTime,
+                endTime = endTime
+            )
+
+            timeEntryDao.update(updatedEntry)
+        }
+    }
 }

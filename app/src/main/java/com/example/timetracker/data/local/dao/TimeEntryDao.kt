@@ -27,4 +27,7 @@ interface TimeEntryDao {
 
     @Query("DELETE FROM time_entries WHERE id = :entryId")
     suspend fun delete(entryId: Long?)
+
+    @Query("SELECT * FROM time_entries WHERE id = :entryId")
+    suspend fun getEntryById(entryId: Long): TimeEntryEntity?
 }

@@ -45,4 +45,5 @@ interface ITimeTrackerRepository {
     suspend fun stopActivity(activityId: Long)
 
     suspend fun deleteTimeEntry(entry: Long?)
+    suspend fun updateEntryTimes(entryId: Long, startTime: Long, endTime: Long?)
 }

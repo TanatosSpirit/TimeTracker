@@ -7,6 +7,7 @@ import com.example.timetracker.data.local.entities.TimeEntryEntity
 import com.example.timetracker.domain.model.HourSegment
 import com.example.timetracker.domain.usecase.activity.*
 import com.example.timetracker.domain.usecase.entry.DeleteTimeEntryUseCase
+import com.example.timetracker.domain.usecase.entry.UpdateEntryTimesUseCase
 import com.example.timetracker.domain.usecase.entry.GetEntriesByDateUseCase
 import com.example.timetracker.domain.usecase.entry.SplitEntryToSegmentsUseCase
 import com.example.timetracker.presentation.common.utils.DateUtils
@@ -26,7 +27,8 @@ class TimelineViewModel @Inject constructor(
     private val createActivityUseCase: CreateActivityUseCase,
     private val startActivityUseCase: StartActivityUseCase,
     private val splitEntryToSegmentsUseCase: SplitEntryToSegmentsUseCase,
-    private val deleteTimeEntryUseCase: DeleteTimeEntryUseCase
+    private val deleteTimeEntryUseCase: DeleteTimeEntryUseCase,
+    private val updateEntryTimesUseCase: UpdateEntryTimesUseCase
 ) : ViewModel() {
 
     // ========== State ==========
@@ -124,6 +126,12 @@ class TimelineViewModel @Inject constructor(
     fun deleteEntry(entryId: Long?) {
         viewModelScope.launch(Dispatchers.IO) {
             deleteTimeEntryUseCase(entryId)
+        }
+    }
+
+    fun updateEntryTimes(entryId: Long, startTime: Long, endTime: Long?) {
+        viewModelScope.launch {
+            updateEntryTimesUseCase(entryId, startTime, endTime)
         }
     }
 }

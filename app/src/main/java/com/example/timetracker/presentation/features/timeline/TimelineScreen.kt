@@ -96,7 +96,11 @@ fun TimelineScreen(
             activity = activity,
             isActive = activeEntries.any { it.id == entry.id },
             onDismiss = { selectedEntry = null },
-            onDeleteClick = { entryToDelete = entry.id }
+            onDeleteClick = { entryToDelete = entry.id },
+            onTimeUpdate = { newStartTime, newEndTime ->
+                viewModel.updateEntryTimes(entry.id, newStartTime, newEndTime)
+                selectedEntry = null
+            }
         )
     }
 
