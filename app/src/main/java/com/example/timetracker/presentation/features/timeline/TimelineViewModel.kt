@@ -78,7 +78,7 @@ class TimelineViewModel @Inject constructor(
     // ========== Initialization ==========
 
     init {
-        _scrollToCurrentTime.value = System.currentTimeMillis()
+//        _scrollToCurrentTime.value = System.currentTimeMillis()
     }
 
     // ========== Actions ==========

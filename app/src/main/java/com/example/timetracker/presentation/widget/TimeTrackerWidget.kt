@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.glance.action.actionParametersOf
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
+import com.example.timetracker.presentation.MainActivity
 
 class TimeTrackerWidget : GlanceAppWidget() {
     
@@ -85,7 +86,15 @@ fun WidgetContent(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 ),
-                modifier = GlanceModifier.defaultWeight()
+                modifier = GlanceModifier
+                    .defaultWeight()
+                    .clickable(
+                        onClick = actionStartActivity(
+                            Intent(context, MainActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                            }
+                        )
+                    )
             )
 
             Box(
