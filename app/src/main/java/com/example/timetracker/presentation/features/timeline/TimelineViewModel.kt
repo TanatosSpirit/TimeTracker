@@ -12,6 +12,7 @@ import com.example.timetracker.domain.usecase.entry.SplitEntryToSegmentsUseCase
 import com.example.timetracker.presentation.common.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
@@ -38,6 +39,13 @@ class TimelineViewModel @Inject constructor(
 
     // ========== Data Streams ==========
 
+    private val ticker = flow {
+        while (true) {
+            emit(System.currentTimeMillis())
+            delay(60000)
+        }
+    }
+
     val currentDateString = selectedDate.map { date ->
         DateUtils.formatDayString(date)
     }.stateIn(viewModelScope, SharingStarted.Lazily, DateUtils.formatDayString(Date()))
@@ -47,12 +55,17 @@ class TimelineViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     val hourSegments: StateFlow<List<HourSegment>> =
-        combine(timeEntries, selectedDate) { entries, date ->
-            val now = System.currentTimeMillis()
+        combine(timeEntries, selectedDate, ticker) { entries, date, currentTime ->
+            // Теперь функция пересчитывается каждый раз, когда ticker выдает новое значение currentTime
             entries.flatMap { entry ->
-                splitEntryToSegmentsUseCase(entry, date, now)
+                splitEntryToSegmentsUseCase(entry, date, currentTime)
             }
-        }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+        }.stateIn(
+            scope = viewModelScope,
+            // Используйте WhileSubscribed, чтобы ticker не работал впустую, когда приложение свернуто
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     val activities = getActivitiesUseCase()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())

@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.timetracker.domain.model.Activity
 import com.example.timetracker.domain.model.TimeEntry
 import com.example.timetracker.presentation.features.timeline.TimelineViewModel
@@ -22,10 +23,11 @@ import com.example.timetracker.ui.theme.TimeTrackerTheme
 fun TimelineScreen(
     viewModel: TimelineViewModel = hiltViewModel()
 ) {
-    val selectedDate by viewModel.selectedDate.collectAsState()
-    val hourSegments by viewModel.hourSegments.collectAsState()
-    val activities by viewModel.activities.collectAsState()
-    val activeEntries by viewModel.activeEntries.collectAsState()
+    val selectedDate by viewModel.selectedDate.collectAsStateWithLifecycle()
+    val hourSegments by viewModel.hourSegments.collectAsStateWithLifecycle()
+    val activities by viewModel.activities.collectAsStateWithLifecycle()
+    val activeEntries by viewModel.activeEntries.collectAsStateWithLifecycle()
+
     val scrollToCurrentTime by viewModel.scrollToCurrentTime.collectAsState()
 
     var showAddDialog by remember { mutableStateOf(false) }
