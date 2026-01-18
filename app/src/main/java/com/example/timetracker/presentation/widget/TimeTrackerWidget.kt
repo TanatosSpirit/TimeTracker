@@ -174,14 +174,6 @@ fun ActivityButton(
                 ),
                 modifier = GlanceModifier.defaultWeight()
             )
-            
-            Text(
-                text = if (isActive) "⏹" else "▶",
-                style = TextStyle(
-                    color = ColorProvider(Color.White, Color.Black),
-                    fontSize = 16.sp
-                )
-            )
         }
     }
 }
