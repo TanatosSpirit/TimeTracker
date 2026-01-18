@@ -29,6 +29,11 @@ interface ITimeTrackerRepository {
      */
     suspend fun startActivity(activityId: Long)
 
+    /**
+     * Изменить название активности
+     */
+    suspend fun updateActivityName(activityId: Long, name: String)
+
     // ========== TimeEntry ==========
 
     /**

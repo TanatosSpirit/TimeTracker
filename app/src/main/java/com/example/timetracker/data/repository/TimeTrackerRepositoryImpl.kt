@@ -68,6 +68,18 @@ class TimeTrackerRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateActivityName(activityId: Long, name: String) {
+        val activity = activityDao.getActivityById(activityId)
+
+        activity?.let { activity ->
+            val updatedActivity = activity.copy(
+                name = name
+            )
+
+            activityDao.update(updatedActivity)
+        }
+    }
+
     // ========== TimeEntry ==========
 
     override fun getEntriesByDate(date: String): Flow<List<TimeEntry>> {

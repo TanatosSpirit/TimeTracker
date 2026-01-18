@@ -10,6 +10,7 @@ import com.example.timetracker.domain.usecase.entry.DeleteTimeEntryUseCase
 import com.example.timetracker.domain.usecase.entry.UpdateEntryTimesUseCase
 import com.example.timetracker.domain.usecase.entry.GetEntriesByDateUseCase
 import com.example.timetracker.domain.usecase.entry.SplitEntryToSegmentsUseCase
+import com.example.timetracker.domain.usecase.activity.UpdateActivityName
 import com.example.timetracker.presentation.common.utils.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +29,8 @@ class TimelineViewModel @Inject constructor(
     private val startActivityUseCase: StartActivityUseCase,
     private val splitEntryToSegmentsUseCase: SplitEntryToSegmentsUseCase,
     private val deleteTimeEntryUseCase: DeleteTimeEntryUseCase,
-    private val updateEntryTimesUseCase: UpdateEntryTimesUseCase
+    private val updateEntryTimesUseCase: UpdateEntryTimesUseCase,
+    private val updateActivityNameUseCase: UpdateActivityName
 ) : ViewModel() {
 
     // ========== State ==========
@@ -132,6 +134,12 @@ class TimelineViewModel @Inject constructor(
     fun updateEntryTimes(entryId: Long, startTime: Long, endTime: Long?) {
         viewModelScope.launch {
             updateEntryTimesUseCase(entryId, startTime, endTime)
+        }
+    }
+
+    fun updateActivityName(activityId: Long, name: String) {
+        viewModelScope.launch {
+            updateActivityNameUseCase(activityId, name)
         }
     }
 }

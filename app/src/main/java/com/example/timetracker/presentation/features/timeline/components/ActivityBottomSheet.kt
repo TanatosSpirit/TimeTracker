@@ -13,9 +13,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.foundation.text.BasicTextField
 import com.example.timetracker.domain.model.Activity
 import com.example.timetracker.domain.model.TimeEntry
 import com.example.timetracker.presentation.common.utils.DurationFormatter
@@ -31,7 +34,8 @@ fun ActivityBottomSheet(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     onDeleteClick: () -> Unit,
-    onTimeUpdate: (Long, Long?) -> Unit = { _, _ -> }
+    onTimeUpdate: (Long, Long?) -> Unit,
+    onNameUpdate: (String) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
 
@@ -42,6 +46,8 @@ fun ActivityBottomSheet(
     // Состояние видимости пикеров
     var showStartTimePicker by remember { mutableStateOf(false) }
     var showEndTimePicker by remember { mutableStateOf(false) }
+
+    var editedName by remember { mutableStateOf(activity.name) }
 
     // Для активных записей (таймер)
     var currentTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
@@ -77,11 +83,19 @@ fun ActivityBottomSheet(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = activity.name,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
+                BasicTextField(
+                    value = editedName,
+                    onValueChange = {newValue ->
+                        editedName = newValue
+                        onNameUpdate(newValue)},
+                    textStyle = TextStyle(
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White // цвет текста
+                    ),
+                    modifier = Modifier.weight(1f),
+                    singleLine = true,
+                    cursorBrush = SolidColor(Color.Blue) // цвет курсора
                 )
 
                 // Блок редактирования времени

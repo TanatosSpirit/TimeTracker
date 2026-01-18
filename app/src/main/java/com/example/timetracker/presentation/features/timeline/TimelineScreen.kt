@@ -100,6 +100,9 @@ fun TimelineScreen(
             onTimeUpdate = { newStartTime, newEndTime ->
                 viewModel.updateEntryTimes(entry.id, newStartTime, newEndTime)
                 selectedEntry = null
+            },
+            onNameUpdate = { newName ->
+                viewModel.updateActivityName(activity.id, newName)
             }
         )
     }
