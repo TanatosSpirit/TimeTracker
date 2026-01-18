@@ -83,6 +83,7 @@ fun WidgetContent(
             Text(
                 text = "Time Tracker",
                 style = TextStyle(
+                    color = ColorProvider(Color.Black, Color.White),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 ),
