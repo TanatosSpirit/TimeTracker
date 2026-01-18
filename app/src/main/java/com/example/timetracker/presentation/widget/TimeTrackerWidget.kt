@@ -120,24 +120,49 @@ fun WidgetContent(
 
         Spacer(modifier = GlanceModifier.height(8.dp))
 
+        // Двухколоночная сетка
         LazyColumn(
-            modifier = GlanceModifier
-                .defaultWeight()  // Занимает оставшееся место
-            // .fillMaxHeight() — если нужно жёстко
+            modifier = GlanceModifier.defaultWeight()
         ) {
-            items(allActivities) { activity ->  // DSL: items(список) { item -> ... }
-                val isActive = activity.id in activeActivityIds
-                ActivityButton(
-                    activity = activity,
-                    isActive = isActive
-                )
-                // Spacer между кнопками — внутри LazyColumn (не считается ребёнком главного Column)
+            // Группируем активности по парам
+            val activityPairs = allActivities.chunked(2)
+
+            items(activityPairs) { pair ->
+                Row(
+                    modifier = GlanceModifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.Horizontal.Start
+                ) {
+                    // Левая колонка
+                    Box(modifier = GlanceModifier.defaultWeight()) {
+                        val activity = pair[0]
+                        val isActive = activity.id in activeActivityIds
+                        ActivityButton(
+                            activity = activity,
+                            isActive = isActive
+                        )
+                    }
+
+                    Spacer(modifier = GlanceModifier.width(4.dp))
+
+                    // Правая колонка (если есть второй элемент)
+                    Box(modifier = GlanceModifier.defaultWeight()) {
+                        if (pair.size > 1) {
+                            val activity = pair[1]
+                            val isActive = activity.id in activeActivityIds
+                            ActivityButton(
+                                activity = activity,
+                                isActive = isActive
+                            )
+                        } else {
+                            // Пустое место, чтобы сохранить выравнивание
+                            Spacer(modifier = GlanceModifier.fillMaxWidth())
+                        }
+                    }
+                }
+
                 Spacer(modifier = GlanceModifier.height(4.dp))
             }
         }
-
-        // "More" button
-        // Box(...) { ... }
     }
 }
 
