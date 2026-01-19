@@ -19,6 +19,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import com.example.timetracker.domain.model.Activity
 import com.example.timetracker.domain.model.TimeEntry
 import com.example.timetracker.presentation.common.utils.DurationFormatter
@@ -35,7 +37,8 @@ fun ActivityBottomSheet(
     modifier: Modifier = Modifier,
     onDeleteClick: () -> Unit,
     onTimeUpdate: (Long, Long?) -> Unit,
-    onNameUpdate: (String) -> Unit
+    onNameUpdate: (String) -> Unit,
+    onColorUpdate: (Long) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
 
@@ -48,6 +51,9 @@ fun ActivityBottomSheet(
     var showEndTimePicker by remember { mutableStateOf(false) }
 
     var editedName by remember { mutableStateOf(activity.name) }
+
+    var selectedColor by remember { mutableLongStateOf(activity.color) }
+    var showColorPicker by remember { mutableStateOf(false) }
 
     // Для активных записей (таймер)
     var currentTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
@@ -96,6 +102,16 @@ fun ActivityBottomSheet(
                     modifier = Modifier.weight(1f),
                     singleLine = true,
                     cursorBrush = SolidColor(Color.Blue) // цвет курсора
+                )
+
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .background(
+                            color = Color(selectedColor),
+                            shape = CircleShape
+                        )
+                        .clickable { showColorPicker = true }
                 )
 
                 // Блок редактирования времени
@@ -195,6 +211,56 @@ fun ActivityBottomSheet(
                 showEndTimePicker = false
             },
             onDismiss = { showEndTimePicker = false }
+        )
+    }
+
+    if (showColorPicker) {
+        AlertDialog(
+            onDismissRequest = { showColorPicker = false },
+            title = { Text("Choose Color") },
+            text = {
+                Column {
+                    // Разбиваем палитру на ряды по 4 цвета
+                    Activity.COLOR_PALETTE.chunked(4).forEach { rowColors ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            rowColors.forEach { colorValue ->
+                                Box(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .background(
+                                            color = Color(colorValue),
+                                            shape = CircleShape
+                                        )
+                                        .clickable {
+                                            selectedColor = colorValue
+                                            showColorPicker = false
+                                            onColorUpdate(colorValue)
+                                        }
+                                        .then(
+                                            if (selectedColor == colorValue) {
+                                                Modifier.border(
+                                                    width = 3.dp,
+                                                    color = Color.White,
+                                                    shape = CircleShape
+                                                )
+                                            } else Modifier
+                                        )
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showColorPicker = false }) {
+                    Text("Close")
+                }
+            }
         )
     }
 }

@@ -103,6 +103,9 @@ fun TimelineScreen(
             },
             onNameUpdate = { newName ->
                 viewModel.updateActivityName(activity.id, newName)
+            },
+            onColorUpdate = { newColor ->
+                viewModel.updateActivityColor(activity.id, newColor)
             }
         )
     }

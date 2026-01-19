@@ -30,7 +30,8 @@ class TimelineViewModel @Inject constructor(
     private val splitEntryToSegmentsUseCase: SplitEntryToSegmentsUseCase,
     private val deleteTimeEntryUseCase: DeleteTimeEntryUseCase,
     private val updateEntryTimesUseCase: UpdateEntryTimesUseCase,
-    private val updateActivityNameUseCase: UpdateActivityName
+    private val updateActivityNameUseCase: UpdateActivityName,
+    private val updateActivityColorUseCase: UpdateActivityColor
 ) : ViewModel() {
 
     // ========== State ==========
@@ -142,4 +143,11 @@ class TimelineViewModel @Inject constructor(
             updateActivityNameUseCase(activityId, name)
         }
     }
+
+    fun updateActivityColor(activityId: Long, color: Long) {
+        viewModelScope.launch {
+            updateActivityColorUseCase(activityId, color)
+        }
+    }
+
 }

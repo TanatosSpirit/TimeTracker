@@ -20,7 +20,7 @@ class CreateActivityUseCase @Inject constructor(
      * @return ID созданной активности
      */
     suspend operator fun invoke(name: String, timestamp: Long): Long {
-        val color = generateRandomColor()
+        val color = DEFAULT_COLOR
         return repository.createActivity(
             name = name,
             color = color,
@@ -28,7 +28,7 @@ class CreateActivityUseCase @Inject constructor(
         )
     }
 
-    private fun generateRandomColor(): Long {
-        return Activity.COLOR_PALETTE[Random.nextInt(Activity.COLOR_PALETTE.size)]
+    companion object {
+        private const val DEFAULT_COLOR = 0xFF9E9E9E // Серый цвет
     }
 }
