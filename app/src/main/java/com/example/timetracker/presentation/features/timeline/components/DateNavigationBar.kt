@@ -20,11 +20,9 @@ fun DateNavigationBar(
     date: Date,
     onPreviousDay: () -> Unit,
     onNextDay: () -> Unit,
-    onToday: () -> Unit,
+    onNow: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isToday = DateUtils.isToday(date)
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -42,10 +40,8 @@ fun DateNavigationBar(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium
             )
-            if (!isToday) {
-                TextButton(onClick = onToday) {
-                    Text("Today")
-                }
+            TextButton(onClick = onNow) {
+                Text("Now")
             }
         }
 

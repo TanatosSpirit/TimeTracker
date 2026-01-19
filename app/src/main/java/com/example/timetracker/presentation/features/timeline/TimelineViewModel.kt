@@ -113,7 +113,7 @@ class TimelineViewModel @Inject constructor(
     /**
      * Перейти к сегодняшнему дню и проскроллить к текущему времени
      */
-    fun goToToday() {
+    fun goToNow() {
         _selectedDate.value = Date()
         _scrollToCurrentTime.value = System.currentTimeMillis()
     }

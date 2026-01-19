@@ -60,7 +60,7 @@ fun TimelineScreen(
                     date = selectedDate,
                     onPreviousDay = { viewModel.previousDay() },
                     onNextDay = { viewModel.nextDay() },
-                    onToday = { viewModel.goToToday() }
+                    onNow = { viewModel.goToNow() }
                 )
 
                 DayTimeline(
