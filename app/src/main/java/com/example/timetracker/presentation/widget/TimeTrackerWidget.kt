@@ -39,7 +39,7 @@ class TimeTrackerWidget : GlanceAppWidget() {
         )
 
         // Получаем Flow напрямую из репозитория
-        val activitiesFlow = repository.getAllActivities()
+        val activitiesFlow = repository.getAllActivitiesByName()
         val activeEntriesFlow = repository.getActiveEntries()
 
         provideContent {

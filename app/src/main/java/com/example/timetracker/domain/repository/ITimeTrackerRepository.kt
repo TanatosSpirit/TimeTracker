@@ -19,6 +19,8 @@ interface ITimeTrackerRepository {
      */
     fun getAllActivities(): Flow<List<Activity>>
 
+    fun getAllActivitiesByName(): Flow<List<Activity>>
+
     /**
      * Создать новую активность
      */

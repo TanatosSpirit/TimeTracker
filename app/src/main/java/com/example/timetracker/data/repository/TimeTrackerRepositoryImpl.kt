@@ -35,6 +35,11 @@ class TimeTrackerRepositoryImpl @Inject constructor(
             .map { entities -> ActivityMapper.toDomainList(entities) }
     }
 
+    override fun getAllActivitiesByName(): Flow<List<Activity>> {
+        return activityDao.getAllActivitiesByName()
+            .map { entities -> ActivityMapper.toDomainList(entities) }
+    }
+
     override suspend fun createActivity(name: String, color: Long, timestamp: Long): Long {
         val activity = ActivityEntity(
             name = name,

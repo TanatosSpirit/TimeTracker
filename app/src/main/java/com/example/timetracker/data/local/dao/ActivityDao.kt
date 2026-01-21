@@ -9,6 +9,9 @@ import kotlinx.coroutines.flow.Flow
 interface ActivityDao {
     @Query("SELECT * FROM activities ORDER BY usageCount DESC, lastUsedAt DESC")
     fun getAllActivities(): Flow<List<ActivityEntity>>
+
+    @Query("SELECT * FROM activities ORDER BY name ASC")
+    fun getAllActivitiesByName(): Flow<List<ActivityEntity>>
     
     @Query("SELECT * FROM activities WHERE id = :id")
     suspend fun getActivityById(id: Long): ActivityEntity?
