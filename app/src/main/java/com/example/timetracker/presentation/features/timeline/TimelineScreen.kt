@@ -38,40 +38,38 @@ fun TimelineScreen(
     // 1. Состояние в начале TimelineScreen
     var entryToDelete by remember { mutableStateOf<Long?>(null) }
 
-    TimeTrackerTheme(darkTheme = isDarkTheme) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            TopAppBar(
-                title = { Text("Calendar") },
-                windowInsets = WindowInsets(0, 0, 0, 0),
-                actions = {
-                    IconButton(onClick = { showAddDialog = true }) {
-                        Icon(Icons.Default.Add, contentDescription = "Add Activity")
-                    }
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        TopAppBar(
+            title = { Text("Calendar") },
+            windowInsets = WindowInsets(0, 0, 0, 0),
+            actions = {
+                IconButton(onClick = { showAddDialog = true }) {
+                    Icon(Icons.Default.Add, contentDescription = "Add Activity")
                 }
-            )
+            }
+        )
 
-            DateNavigationBar(
-                date = selectedDate,
-                onPreviousDay = { viewModel.previousDay() },
-                onNextDay = { viewModel.nextDay() },
-                onNow = { viewModel.goToNow() }
-            )
+        DateNavigationBar(
+            date = selectedDate,
+            onPreviousDay = { viewModel.previousDay() },
+            onNextDay = { viewModel.nextDay() },
+            onNow = { viewModel.goToNow() }
+        )
 
-            DayTimeline(
-                hourSegments = hourSegments,
-                activities = activities,
-                activeEntries = activeEntries,
-                selectedDate = selectedDate,
-                scrollToTime = scrollToCurrentTime,
-                onScrollCompleted = { viewModel.onScrollCompleted() },
-                onEntryClick = { entry, activity ->
-                    selectedEntry = Pair(entry, activity)
-                },
-                modifier = Modifier.weight(1f)
-            )
-        }
+        DayTimeline(
+            hourSegments = hourSegments,
+            activities = activities,
+            activeEntries = activeEntries,
+            selectedDate = selectedDate,
+            scrollToTime = scrollToCurrentTime,
+            onScrollCompleted = { viewModel.onScrollCompleted() },
+            onEntryClick = { entry, activity ->
+                selectedEntry = Pair(entry, activity)
+            },
+            modifier = Modifier.weight(1f)
+        )
     }
 
     // Диалоги и Bottom Sheets
