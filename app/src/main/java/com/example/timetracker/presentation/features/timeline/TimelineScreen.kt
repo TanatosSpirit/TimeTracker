@@ -39,43 +39,38 @@ fun TimelineScreen(
     var entryToDelete by remember { mutableStateOf<Long?>(null) }
 
     TimeTrackerTheme(darkTheme = isDarkTheme) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text("Time Tracker") },
-                    actions = {
-                        IconButton(onClick = { showAddDialog = true }) {
-                            Icon(Icons.Default.Add, contentDescription = "Add Activity")
-                        }
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            TopAppBar(
+                title = { Text("Calendar") },
+                windowInsets = WindowInsets(0, 0, 0, 0),
+                actions = {
+                    IconButton(onClick = { showAddDialog = true }) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Activity")
                     }
-                )
-            }
-        ) { padding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            ) {
-                DateNavigationBar(
-                    date = selectedDate,
-                    onPreviousDay = { viewModel.previousDay() },
-                    onNextDay = { viewModel.nextDay() },
-                    onNow = { viewModel.goToNow() }
-                )
+                }
+            )
 
-                DayTimeline(
-                    hourSegments = hourSegments,
-                    activities = activities,
-                    activeEntries = activeEntries,
-                    selectedDate = selectedDate,
-                    scrollToTime = scrollToCurrentTime,
-                    onScrollCompleted = { viewModel.onScrollCompleted() },
-                    onEntryClick = { entry, activity ->
-                        selectedEntry = Pair(entry, activity)
-                    },
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            DateNavigationBar(
+                date = selectedDate,
+                onPreviousDay = { viewModel.previousDay() },
+                onNextDay = { viewModel.nextDay() },
+                onNow = { viewModel.goToNow() }
+            )
+
+            DayTimeline(
+                hourSegments = hourSegments,
+                activities = activities,
+                activeEntries = activeEntries,
+                selectedDate = selectedDate,
+                scrollToTime = scrollToCurrentTime,
+                onScrollCompleted = { viewModel.onScrollCompleted() },
+                onEntryClick = { entry, activity ->
+                    selectedEntry = Pair(entry, activity)
+                },
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 
