@@ -2,7 +2,7 @@
 package com.example.timetracker.presentation.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -20,6 +20,6 @@ sealed class Screen(
     object Sphere : Screen(
         route = "sphere",
         title = "Sphere",
-        icon = Icons.Default.Category
+        icon = Icons.Default.Face
     )
 }
