@@ -6,22 +6,24 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Time Tracker"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar">
-        
+        android:theme="@style/Theme.TimeTracker">
+
+        <!-- MAIN / LAUNCHER -->
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"
-            android:theme="@android:style/Theme.Material.Light.NoActionBar">
+            android:theme="@style/Theme.TimeTracker.Splash">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Quick Entry Activity (для добавления новой рутины) -->
+        <!-- Quick Entry Activity -->
         <activity
             android:name=".presentation.QuickEntryActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:theme="@style/Theme.TimeTracker"
             android:excludeFromRecents="true"
             android:taskAffinity=""
             android:launchMode="singleInstance"
@@ -38,5 +40,6 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info" />
         </receiver>
+
     </application>
 </manifest>

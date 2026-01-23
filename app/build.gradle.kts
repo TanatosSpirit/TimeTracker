@@ -12,36 +12,61 @@ android {
 
     defaultConfig {
         applicationId = "com.example.timetracker"
-        minSdk = 35  // Android 16
+        minSdk = 35
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }
+    
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("arm64-v8a")
+            isUniversalApk = false  // не создавать универсальный APK
+        }
+    }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            // Дополнительно можно добавить:
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"  // уменьшает debug info
+            }
         }
     }
-    
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/versions/**"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    
+
     kotlinOptions {
         jvmTarget = "17"
     }
-    
+
     buildFeatures {
         compose = true
     }
-    
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"
     }
 }
+
 
 dependencies {
     // Compose BOM - управляет версиями всех Compose библиотек
@@ -73,4 +98,6 @@ dependencies {
 
     // Core
     implementation("androidx.core:core-ktx:1.15.0")
+
+    implementation("androidx.core:core-splashscreen:1.0.1")
 }

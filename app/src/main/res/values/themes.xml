@@ -2,4 +2,12 @@
 <resources>
 
     <style name="Theme.TimeTracker" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.TimeTracker.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#121212</item>
+        <item name="postSplashScreenTheme">@style/Theme.TimeTracker</item>
+
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
 </resources>
