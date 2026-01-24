@@ -40,15 +40,15 @@ class TimeTrackerRepositoryImpl @Inject constructor(
             .map { entities -> ActivityMapper.toDomainList(entities) }
     }
 
-    override suspend fun createActivity(name: String, color: Long, timestamp: Long): Long {
-        val activity = ActivityEntity(
-            name = name,
-            color = color,
-            usageCount = 1,
-            lastUsedAt = timestamp
-        )
-        return activityDao.insert(activity)
-    }
+//    override suspend fun createActivity(name: String, color: Long, timestamp: Long): Long {
+//        val activity = ActivityEntity(
+//            name = name,
+//            color = color,
+//            usageCount = 1,
+//            lastUsedAt = timestamp
+//        )
+//        return activityDao.insert(activity)
+//    }
 
     override suspend fun startActivity(activityId: Long) {
         val now = System.currentTimeMillis()
@@ -85,17 +85,17 @@ class TimeTrackerRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateActivityColor(activityId: Long, color: Long) {
-        val activity = activityDao.getActivityById(activityId)
-
-        activity?.let { activity ->
-            val updatedActivity = activity.copy(
-                color = color
-            )
-
-            activityDao.update(updatedActivity)
-        }
-    }
+//    override suspend fun updateActivityColor(activityId: Long, color: Long) {
+//        val activity = activityDao.getActivityById(activityId)
+//
+//        activity?.let { activity ->
+//            val updatedActivity = activity.copy(
+//                color = color
+//            )
+//
+//            activityDao.update(updatedActivity)
+//        }
+//    }
 
     // ========== TimeEntry ==========
 

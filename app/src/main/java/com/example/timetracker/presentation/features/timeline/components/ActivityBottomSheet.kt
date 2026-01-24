@@ -38,7 +38,7 @@ fun ActivityBottomSheet(
     onDeleteClick: () -> Unit,
     onTimeUpdate: (Long, Long?) -> Unit,
     onNameUpdate: (String) -> Unit,
-    onColorUpdate: (Long) -> Unit
+//    onColorUpdate: (Long) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
 
@@ -214,55 +214,55 @@ fun ActivityBottomSheet(
         )
     }
 
-    if (showColorPicker) {
-        AlertDialog(
-            onDismissRequest = { showColorPicker = false },
-            title = { Text("Choose Color") },
-            text = {
-                Column {
-                    // Разбиваем палитру на ряды по 4 цвета
-                    Activity.COLOR_PALETTE.chunked(4).forEach { rowColors ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            rowColors.forEach { colorValue ->
-                                Box(
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .background(
-                                            color = Color(colorValue),
-                                            shape = CircleShape
-                                        )
-                                        .clickable {
-                                            selectedColor = colorValue
-                                            showColorPicker = false
-                                            onColorUpdate(colorValue)
-                                        }
-                                        .then(
-                                            if (selectedColor == colorValue) {
-                                                Modifier.border(
-                                                    width = 3.dp,
-                                                    color = Color.White,
-                                                    shape = CircleShape
-                                                )
-                                            } else Modifier
-                                        )
-                                )
-                            }
-                        }
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showColorPicker = false }) {
-                    Text("Close")
-                }
-            }
-        )
-    }
+//    if (showColorPicker) {
+//        AlertDialog(
+//            onDismissRequest = { showColorPicker = false },
+//            title = { Text("Choose Color") },
+//            text = {
+//                Column {
+//                    // Разбиваем палитру на ряды по 4 цвета
+//                    Activity.COLOR_PALETTE.chunked(4).forEach { rowColors ->
+//                        Row(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .padding(vertical = 4.dp),
+//                            horizontalArrangement = Arrangement.SpaceEvenly
+//                        ) {
+//                            rowColors.forEach { colorValue ->
+//                                Box(
+//                                    modifier = Modifier
+//                                        .size(48.dp)
+//                                        .background(
+//                                            color = Color(colorValue),
+//                                            shape = CircleShape
+//                                        )
+//                                        .clickable {
+//                                            selectedColor = colorValue
+//                                            showColorPicker = false
+//                                            onColorUpdate(colorValue)
+//                                        }
+//                                        .then(
+//                                            if (selectedColor == colorValue) {
+//                                                Modifier.border(
+//                                                    width = 3.dp,
+//                                                    color = Color.White,
+//                                                    shape = CircleShape
+//                                                )
+//                                            } else Modifier
+//                                        )
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//            },
+//            confirmButton = {
+//                TextButton(onClick = { showColorPicker = false }) {
+//                    Text("Close")
+//                }
+//            }
+//        )
+//    }
 }
 
 // Вспомогательный компонент для TimePicker (Material 3)

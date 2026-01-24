@@ -22,7 +22,7 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.example.timetracker.data.local.database.AppDatabase
 import com.example.timetracker.data.repository.TimeTrackerRepositoryImpl
-import com.example.timetracker.presentation.QuickEntryActivity
+//import com.example.timetracker.presentation.QuickEntryActivity
 import androidx.compose.runtime.getValue
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.longPreferencesKey
@@ -180,25 +180,25 @@ fun HeaderSection(
         )
 
         // Кнопка "+"
-        Box(
-            modifier = GlanceModifier
-                .size(32.dp)
-                .background(Color(0xFF2196F3))
-                .cornerRadius(16.dp)
-                .clickable(actionStartActivity(
-                    Intent(context, QuickEntryActivity::class.java)
-                )),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "+",
-                style = TextStyle(
-                    color = ColorProvider(Color.White, Color.Black),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            )
-        }
+//        Box(
+//            modifier = GlanceModifier
+//                .size(32.dp)
+//                .background(Color(0xFF2196F3))
+//                .cornerRadius(16.dp)
+//                .clickable(actionStartActivity(
+//                    Intent(context, QuickEntryActivity::class.java)
+//                )),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            Text(
+//                text = "+",
+//                style = TextStyle(
+//                    color = ColorProvider(Color.White, Color.Black),
+//                    fontSize = 20.sp,
+//                    fontWeight = FontWeight.Bold
+//                )
+//            )
+//        }
     }
 }
 

@@ -73,15 +73,15 @@ fun TimelineScreen(
     }
 
     // Диалоги и Bottom Sheets
-    if (showAddDialog) {
-        AddActivityDialog(
-            onDismiss = { showAddDialog = false },
-            onConfirm = { name ->
-                viewModel.createAndStartActivity(name)
-                showAddDialog = false
-            }
-        )
-    }
+//    if (showAddDialog) {
+//        AddActivityDialog(
+//            onDismiss = { showAddDialog = false },
+//            onConfirm = { name ->
+//                viewModel.createAndStartActivity(name)
+//                showAddDialog = false
+//            }
+//        )
+//    }
 
     selectedEntry?.let { (entry, activity) ->
         ActivityBottomSheet(
@@ -96,10 +96,10 @@ fun TimelineScreen(
             },
             onNameUpdate = { newName ->
                 viewModel.updateActivityName(activity.id, newName)
-            },
-            onColorUpdate = { newColor ->
-                viewModel.updateActivityColor(activity.id, newColor)
             }
+//            onColorUpdate = { newColor ->
+//                viewModel.updateActivityColor(activity.id, newColor)
+//            }
         )
     }
 

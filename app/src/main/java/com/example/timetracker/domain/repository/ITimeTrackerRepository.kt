@@ -24,7 +24,7 @@ interface ITimeTrackerRepository {
     /**
      * Создать новую активность
      */
-    suspend fun createActivity(name: String, color: Long, timestamp: Long): Long
+//    suspend fun createActivity(name: String, color: Long, timestamp: Long): Long
 
     /**
      * Запустить активность (создать запись времени)
@@ -54,5 +54,5 @@ interface ITimeTrackerRepository {
     suspend fun deleteTimeEntry(entry: Long?)
     suspend fun updateEntryTimes(entryId: Long, startTime: Long, endTime: Long?)
 
-    suspend fun updateActivityColor(activityId: Long, color: Long)
+//    suspend fun updateActivityColor(activityId: Long, color: Long)
 }

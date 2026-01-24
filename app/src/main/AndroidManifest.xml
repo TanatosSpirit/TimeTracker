@@ -21,13 +21,13 @@
         </activity>
 
         <!-- Quick Entry Activity -->
-        <activity
-            android:name=".presentation.QuickEntryActivity"
-            android:theme="@style/Theme.TimeTracker"
-            android:excludeFromRecents="true"
-            android:taskAffinity=""
-            android:launchMode="singleInstance"
-            android:exported="true" />
+<!--        <activity-->
+<!--            android:name=".presentation.QuickEntryActivity"-->
+<!--            android:theme="@style/Theme.TimeTracker"-->
+<!--            android:excludeFromRecents="true"-->
+<!--            android:taskAffinity=""-->
+<!--            android:launchMode="singleInstance"-->
+<!--            android:exported="true" />-->
 
         <!-- Widget Receiver -->
         <receiver

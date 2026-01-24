@@ -25,13 +25,13 @@ class TimelineViewModel @Inject constructor(
     private val getActivitiesUseCase: GetActivitiesUseCase,
     private val getActiveEntriesUseCase: GetActiveEntriesUseCase,
     private val getEntriesByDateUseCase: GetEntriesByDateUseCase,
-    private val createActivityUseCase: CreateActivityUseCase,
+//    private val createActivityUseCase: CreateActivityUseCase,
     private val startActivityUseCase: StartActivityUseCase,
     private val splitEntryToSegmentsUseCase: SplitEntryToSegmentsUseCase,
     private val deleteTimeEntryUseCase: DeleteTimeEntryUseCase,
     private val updateEntryTimesUseCase: UpdateEntryTimesUseCase,
     private val updateActivityNameUseCase: UpdateActivityName,
-    private val updateActivityColorUseCase: UpdateActivityColor
+//    private val updateActivityColorUseCase: UpdateActivityColor
 ) : ViewModel() {
 
     // ========== State ==========
@@ -89,13 +89,13 @@ class TimelineViewModel @Inject constructor(
     /**
      * Создать и запустить новую активность
      */
-    fun createAndStartActivity(name: String) {
-        viewModelScope.launch {
-            val now = System.currentTimeMillis()
-            val activityId = createActivityUseCase(name, now)
-            startActivityUseCase(activityId)
-        }
-    }
+//    fun createAndStartActivity(name: String) {
+//        viewModelScope.launch {
+//            val now = System.currentTimeMillis()
+//            val activityId = createActivityUseCase(name, now)
+//            startActivityUseCase(activityId)
+//        }
+//    }
 
     /**
      * Перейти к предыдущему дню
@@ -144,10 +144,10 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    fun updateActivityColor(activityId: Long, color: Long) {
-        viewModelScope.launch {
-            updateActivityColorUseCase(activityId, color)
-        }
-    }
+//    fun updateActivityColor(activityId: Long, color: Long) {
+//        viewModelScope.launch {
+//            updateActivityColorUseCase(activityId, color)
+//        }
+//    }
 
 }
